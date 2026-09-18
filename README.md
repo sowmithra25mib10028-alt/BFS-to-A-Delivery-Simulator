@@ -1,4 +1,4 @@
-# autonomous-delivery-agent-that-navigates-a-2D-grid-city-to-deliver-packages-no-ai-tool-used
+# navigates-a-2D-grid-city-to-deliver-packages-no-ai-tool-used
 An autonomous delivery agent for a 2D grid city using BFS, Uniform-Cost, A*, and local search replanning. It handles static obstacles, terrain costs, and moving obstacles with dynamic replanning. Includes Python CLI, test maps, experiments, and demo showcasing performance across static and dynamic environments.
 
 
@@ -18,7 +18,7 @@ This project is about a delivery agent moving in a city set up as a 2D grid. The
 
 Essentials  
 - Grid maps (small and big)  
-- Supports static + moving obstacles  
+- Supports static +  moving obstacles  
 - Tracks path, cost, explored nodes, and time  
 - CLI tool to run and compare algorithms  
 
