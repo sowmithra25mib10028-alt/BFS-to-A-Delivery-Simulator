@@ -114,7 +114,6 @@ Contributing
 - Commit + push  
 - Open PR  
 
-License  
-MIT  
+
 
 
