@@ -1,119 +1,84 @@
-# Navigates-a-2D-grid-city-to-deliver-packages-no-ai-tool-used
-An autonomous delivery agent for a 2D grid city using BFS, Uniform-Cost, A*, and local search replanning. It handles static obstacles, terrain costs, and moving obstacles with dynamic replanning. Includes Python CLI, test maps, experiments, and demo showcasing performance across static and dynamic environments.
+# Delivery Route Simulator
 
+A small Python project that sends a delivery rider across a grid-shaped city
+and finds the shortest way to each customer using **breadth-first search
+(BFS)**. I also added Dijkstra and A* so I could see what happens when some
+streets are slower than others.
 
+## Why I built it
 
-City Grid Delivery Agent  
+I wanted to understand BFS by watching it solve something real instead of
+tracing nodes on paper. A delivery rider going from a shop to a door is easy
+to picture, and the "fewest blocks" answer is exactly what BFS gives you on a
+grid.
 
-This project is about a delivery agent moving in a city set up as a 2D grid. The agent goes from a start point to a goal while:  
-- avoiding blocked cells,  
-- handling different terrain costs,  
-- and adapting if obstacles shift.  
+## What it does
 
- Algorithms  
-- BFS → finds shortest path (ignores costs)  
-- UCS → considers terrain cost  
-- A* → heuristic + cost, usually faster  
-- Hill Climb → with restarts if stuck  
+- Reads the city from a plain text map (or uses the built-in sample).
+- Starts the rider at the shop (`S`) and visits every customer (`D`).
+- Always heads to the nearest remaining customer next.
+- Draws the final route on the map with `*`.
+- Prints blocks ridden, street cost, tiles searched and run time.
+- Reports any customer that can't be reached instead of crashing.
 
-Essentials  
-- Grid maps (small and big)  
-- Supports static +  moving obstacles  
-- Tracks path, cost, explored nodes, and time  
-- CLI tool to run and compare algorithms  
+## Map symbols
 
+| Symbol | Meaning | Cost |
+|--------|---------|------|
+| `.` | normal street | 1 |
+| `~` | congested street | 3 |
+| `#` | building, can't enter | - |
+| `S` | shop (start) | 1 |
+| `D` | customer drop-off | 1 |
 
+## Files
 
-Prerequisites  
-- Python **3.8+**  
-- pip  
+| File | What's in it |
+|------|--------------|
+| `city_map.py` | the map class, symbols, drawing |
+| `route_finders.py` | BFS, Dijkstra and A* |
+| `rider.py` | the rider and the multi-stop trip logic |
+| `main.py` | command line interface |
+| `test_routes.py` | a few quick checks |
+| `maps/rush_hour.txt` | tiny map where BFS and Dijkstra disagree |
 
+## How to run
 
-Setup  
+Needs Python 3.8 or newer. No extra packages.
 
-1. Clone repo
 ```bash
-git clone https://github.com/hemanth24bas10049-source/autonomous-delivery-agent-that-navigates-a-2D-grid-city-to-deliver-packages-no-ai-tool-used.git
-cd autonomous-delivery-agent-that-navigates-a-2D-grid-city-to-deliver-packages-no-ai-tool-used
-
+python main.py                       # BFS on the sample city
+python main.py --algo dijkstra       # cheapest route instead of shortest
+python main.py --algo astar
+python main.py --compare             # all three side by side
+python main.py --map maps/rush_hour.txt --compare
+python main.py --no-map              # skip the drawing
+python test_routes.py                # run the checks
 ```
 
-2. Make venv (optional)  
-```bash
-python -m venv venv
-# mac / linux
-source venv/bin/activate
-# windows
-venv\Scripts\activate
-```
+You can make your own city by writing a text file where every row is the same
+length, with exactly one `S` and as many `D`s as you like.
 
-3. Install deps
-If you see `requirements.txt`:  
-```bash
-pip install -r requirements.txt
-```
-Else just:  
-```bash
-pip install requests
-```
-
-4. Run 
-Try different algos:  
-```bash
-python city_agent.py --algo bfs
-python city_agent.py --algo ucs
-python city_agent.py --algo astar
-python city_agent.py --algo hill
-```
-
- Usage  
-
-Run BFS:  
-```bash
-python city_agent.py --algo bfs
-```
-
-Run UCS:  
-```bash
-python city_agent.py --algo ucs
-```
-
-Run A*:  
-```bash
-python city_agent.py --algo astar
-```
-
-
-
-Example  
+## Sample result (built-in city)
 
 ```
-Algorithm: UCS
-Path: [(0,0),(1,0),(2,0),(3,0),(3,1),(3,2),(3,3)]
-Cost: 6
-Explored: 21
-Time: 0.003s
+algorithm   blocks    cost  searched
+------------------------------------
+bfs             23      25        93
+dijkstra        23      25        89
+astar           23      25        47
 ```
 
+All three agree here because the congested tiles aren't on the best path, but
+A* only has to look at about half as many tiles.
 
-## Tested API Endpoints  
-- GET `/api/` – check alive  
-- POST `/api/generate-test-map` – make maps  
-- GET `/api/maps` – list maps  
-- GET `/api/maps/{id}` – fetch map  
-- POST `/api/pathfinding` – run BFS/UCS/A*/Hill  
-- POST `/api/generate-report` – PDF of results  
-- POST `/api/cli-command` – call CLI actions  
-- POST `/api/maps` – upload custom map  
+On `maps/rush_hour.txt` they split: BFS rides 4 blocks but pays a cost of 10
+through traffic, while Dijkstra and A* ride 8 blocks for a cost of only 8.
 
+## What I learned
 
-
-Contributing  
-- Fork repo  
-- Make a branch  
-- Commit + push  
-- Open PR  
-
-
-
-
+- BFS is great when every step costs the same, and wrong the moment it doesn't.
+- A* gives the same answer as Dijkstra but searches less, thanks to the
+  distance guess.
+- Greedy "nearest customer next" is simple but not always the best overall
+  order. That would be a good next step (see the report).
